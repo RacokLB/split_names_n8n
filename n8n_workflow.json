@@ -1,0 +1,905 @@
+{
+  "name": "📝Split Names Google Workspace / FAST API / PYTHON",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1IvUzN3QC6eBiUtKaUtRuc1fDX-ztDv4O",
+          "mode": "list",
+          "cachedResultName": "splitNamesN8N",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1IvUzN3QC6eBiUtKaUtRuc1fDX-ztDv4O"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        208,
+        -16
+      ],
+      "id": "7f710e59-ee69-45c9-baa2-1e87920ae2de",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "7MUVuq6zzXITeYKD",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "fileName": "dataSinProcesarNuevoFormato.xlsx"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        784,
+        -16
+      ],
+      "id": "6999a041-9fad-4560-8677-d3f168ebfbf0",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "7MUVuq6zzXITeYKD",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "range": "A4:D16633",
+          "sheetName": "DAT SEPARACION CELDA A COLUMNAS"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        1056,
+        -16
+      ],
+      "id": "6866ebb2-425e-4982-b262-6140920c06b4",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://uifagogfn4.loclx.io/split_names",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.data }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1824,
+        -16
+      ],
+      "id": "c6dcaada-0fd8-4aa0-9ce0-4daa6f0f4683",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {
+          "includeBinaries": false
+        }
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        -16
+      ],
+      "id": "fcf35249-9eff-4a7e-b49e-1498010c4aff",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "505edfae-6acb-4bce-8cf2-0d822b025cb4",
+              "leftValue": "={{ $json.p_nombre }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "96bfac78-155b-4d0e-9e1d-de08e981de7f",
+              "leftValue": "={{ $json.p_apellido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2080,
+        -16
+      ],
+      "id": "e4b5941c-446f-4e5f-a764-a4f529ffc8f6",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "consejonacinoalprogramming@gmail.com",
+        "subject": "Hola Soy botsito, hubo un error con el split names",
+        "message": "Es un placer saludarle.\n\n\nPero tengo malas noticias , el proceso de separacion de nombres complejos que se estaba llevando a cabo tuvo un error.\n\n\nVe a revisar que esta sucediendo por favor!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2112,
+        288
+      ],
+      "id": "365aace9-15bd-4afc-aab6-e5eb8a584373",
+      "name": "Send a message",
+      "webhookId": "9cd2d3d7-e53a-44fe-90dd-d6bdd1fed4f4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "A2tIbtDJ1ajnfpLh",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Append row in sheet').params.documentId.value }}",
+          "mode": "id"
+        },
+        "options": {
+          "fileName": "dataProcesadaLista.xlsx"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3312,
+        -64
+      ],
+      "id": "41c3fbb4-1dff-482d-9bdf-45cddec71409",
+      "name": "Download file2",
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "7MUVuq6zzXITeYKD",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "15W0t_WLPnjbwjBj4-aaKRXfCGWg54vKPvFJIsEWjxSc",
+          "mode": "list",
+          "cachedResultName": "Last_Part_Split_Name",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15W0t_WLPnjbwjBj4-aaKRXfCGWg54vKPvFJIsEWjxSc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "template",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CWqLk6zrsqT3srTli9h7B6eiVflAawf0FTTc5rHY-CM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "p_nombre": "={{ $json.p_nombre }}",
+            "s_nombre": "={{ $json.s_nombre }}",
+            "t_nombre": "={{ $json.t_nombre }}",
+            "p_apellido": "={{ $json.p_apellido }}",
+            "s_apellido": "={{ $json.s_apellido }}",
+            "Cedula": "={{ $json.Cedula }}",
+            "N° ": "={{ $json['N°'] }}",
+            "Nacionalidad": "={{ $json.Nacionalidad }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "N° ",
+              "displayName": "N° ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nacionalidad",
+              "displayName": "Nacionalidad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Cedula",
+              "displayName": "Cedula",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "p_nombre",
+              "displayName": "p_nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "s_nombre",
+              "displayName": "s_nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "t_nombre",
+              "displayName": "t_nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "p_apellido",
+              "displayName": "p_apellido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "s_apellido",
+              "displayName": "s_apellido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3280,
+        176
+      ],
+      "id": "c19a330f-90c6-4473-90e3-c3ef1ab1608a",
+      "name": "Append row in sheet",
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "sXp4CDhR3mEDaJZI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Copy file').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "deletePermanently": false
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2352,
+        -144
+      ],
+      "id": "20e300cc-cff2-4389-b5c1-965975e989ea",
+      "name": "Delete a file",
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "7MUVuq6zzXITeYKD",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch",
+        "useDataOfInput": 2
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2768,
+        -48
+      ],
+      "id": "3d41bc79-b60c-4d36-91f6-9e2b99a33b03",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1WH5hB2Bq0EvIhEMmWQK95pKWwtfW00r_brFI2xfSivM",
+          "mode": "list",
+          "cachedResultName": "  TemplateSplitName",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WH5hB2Bq0EvIhEMmWQK95pKWwtfW00r_brFI2xfSivM/edit?usp=drivesdk"
+        },
+        "name": "Last_Part_Split_Name",
+        "options": {
+          "description": "Esta es la ultima copia para agregar los nombres y apellidos ya clasificados"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2576,
+        -144
+      ],
+      "id": "37d01c9d-1222-4940-9c2e-4927d56cd850",
+      "name": "Copy file1",
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "7MUVuq6zzXITeYKD",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "consejonacionalprogramming@gmail.com",
+        "subject": "Hola Soy Botsito y tienes Data lista para Usar",
+        "message": "=Hola querido {{ $('Send a message2').params.sendTo }} ! 🫡\n\nTengo la responsabilidad de notificar que la data con los nombres y apellidos unidos, ya fue clasificada y verificada por mi proceso interno de automatizacion.\n\n\n\nEl unico trabajo que te queda disponible si lo consideras necesario sera revisar las personas con 2 nombres y 1 solo apellido. \n\n\n\nLo siento, por no lograr automatizar ese proceso, es que necesito un LLM para hacerlo, pero nadie me apoya. \n\n\n\n🤞Hasta luego querido amigo {{ $('Send a message2').params.sendTo }} ! ",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3552,
+        -64
+      ],
+      "id": "ac7921bb-3249-4607-a855-7c23b8fa5ef1",
+      "name": "Send a message2",
+      "webhookId": "b071b6cb-f67d-4e96-91f8-73f933791a1d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "A2tIbtDJ1ajnfpLh",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "*Google Drive Trigger : Check every minute if a new file is make on specific folder.\n*Copy file : Make a copy the original file to leave a backup.\n*Download File : Download binary file to getting the data.",
+        "height": 288,
+        "width": 800,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        144,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "85c78b99-f99b-49c3-b67e-3a9f69da7ccd",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "* Extract from File : Here we extract data and make a specific variables names to avoid make mistake when will need it stored this data on google sheet.\n* Set file : Make a variables where we stored data to match with specific columns \n* Aggregate : Will group every items into an array  to make only one request to API.\n* HTTP Request : Send the data to Backend made with python/pandas and FastAPI.\n* If : Should identify if specific fields are not empty to be true and follow. Instead is false send an email to notify.",
+        "height": 288,
+        "width": 1184,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1024,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "f6bc2064-2327-4fae-b6eb-96c58f715a83",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "* Delete File : We take The ID of first copy we made and delete to try keep clean our folder.\n* Merge  : Only we use the information provide for input number 2 to send a next node.\n* Copy File : Make a copy of template document stored in google drive to get structure in working on this new file.\n* Appends a row : Append data on specific sheet give it fill the new fields this document has\n* Download file 2 : Get new file with the update we made it\n* Send message 2 : Send a friendly message to final user and attachment binary file\n* Delete file2 : To keep a clear order if needful delete(send to trash)   ",
+        "height": 496,
+        "width": 1808,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2304,
+        -336
+      ],
+      "typeVersion": 1,
+      "id": "d6eff946-f689-484b-8cf8-d0ba8ad16740",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Copy file1').first().json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3952,
+        -144
+      ],
+      "id": "3f35ce0a-21c7-44f7-8703-246b5f69ecb8",
+      "name": "Delete a file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "7MUVuq6zzXITeYKD",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6dbe4085-c14f-444f-8be0-cd15aa7e8461",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "9ef19e98-876e-4f7a-8a24-c6db95100bb4",
+              "leftValue": "={{ $json.threadId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3776,
+        -64
+      ],
+      "id": "21e08dc4-d3cf-47c8-83e1-16306ac001db",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "sendTo": "consejonacionalprogramming@gmail.com",
+        "subject": "Hi dear friend somethings goes wrong",
+        "message": "Hi ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3968,
+        16
+      ],
+      "id": "ea6fbb0d-0045-4090-a43c-7d7bf162c4b3",
+      "name": "Send a message1",
+      "webhookId": "45983f03-d9bd-4cd9-ae80-2ddf90c728b0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "A2tIbtDJ1ajnfpLh",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "33dec55e-5b5e-4c3b-bad0-b478d100bce9",
+              "name": "N°",
+              "value": "={{ $json['CANT. REG'] }}",
+              "type": "string"
+            },
+            {
+              "id": "f24da79c-4c51-4abe-88d3-15d5df38edc5",
+              "name": "Nacionalidad",
+              "value": "={{ $json['NAC.'] }}",
+              "type": "string"
+            },
+            {
+              "id": "7f28f5fd-9a78-4363-bc0e-b110d0b719dd",
+              "name": "Cedula",
+              "value": "={{ $json['N° CÉDULA DE IDENTIDAD'] }}",
+              "type": "number"
+            },
+            {
+              "id": "edd8156c-c94d-4749-95d6-b6ec7dd9ddbd",
+              "name": "NOMBRE_COMPLETO",
+              "value": "={{ $json['NOMBRE Y APELLIDOS'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        -16
+      ],
+      "id": "49f873a7-0e33-4589-ae5a-c720d00db874",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "name": "=dataSinProcesar.xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        512,
+        -16
+      ],
+      "id": "5c21aa93-796c-43f6-8e2f-c0f6c69bddbd",
+      "name": "Copy file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "7MUVuq6zzXITeYKD",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 1000,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2976,
+        -48
+      ],
+      "id": "5025ca43-7808-4378-ba53-f606a547b65a",
+      "name": "Loop Over Items"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Copy file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Delete a file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a file": {
+      "main": [
+        [
+          {
+            "node": "Copy file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file2": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message2": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Delete a file1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Download file2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "fc06e1f8-c330-4b7b-92b9-d0608a890864",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "887d8a46840d6986369f8ad60a82c5c8b13967f5be351d5003dbe766f27a53d8"
+  },
+  "id": "ny0KSozqpyw4ILSuiami1",
+  "tags": [
+    {
+      "updatedAt": "2026-02-06T03:47:43.637Z",
+      "createdAt": "2026-02-06T03:47:43.637Z",
+      "id": "FQTs7cc2Ful0qkYu",
+      "name": "python"
+    },
+    {
+      "updatedAt": "2026-02-06T03:47:50.909Z",
+      "createdAt": "2026-02-06T03:47:50.909Z",
+      "id": "PDQnCqFnd3wutG8b",
+      "name": "pandas"
+    },
+    {
+      "updatedAt": "2026-02-10T19:23:19.698Z",
+      "createdAt": "2026-02-10T19:23:19.698Z",
+      "id": "QApYGGpZjevzIU7u",
+      "name": "fastapi"
+    }
+  ]
+}

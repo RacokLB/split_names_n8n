@@ -1,0 +1,18 @@
+services:
+  # Your Python Logic
+  python-api:
+    build: .
+    container_name: name-splitter-api
+    expose:
+      - "8000"
+
+  # The Tunnel Bridge
+  tunnel:
+    image: localxpose/localxpose:latest
+    container_name: loclx-tunnel
+    environment:
+      - LX_ACCESS_TOKEN=WAyuc9eq3eTnFHaXuJgm3TZOejDkAMIQ7CIBWqft
+    # This command tells localxpose to point to the 'python-api' service on port 8000
+    command: tunnel http --to python-api:8000
+    depends_on:
+      - python-api
