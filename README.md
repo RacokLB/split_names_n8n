@@ -1,6 +1,6 @@
 # n8n Name Splitter Automation for Google Workspace
 
-This project provides an automated solution for splitting complex Spanish full names into individual components (First Name, Second Name, First Surname, Second Surname) using an **n8n workflow** and a **FastAPI** backend service.
+This project provides an automated solution for splitting complex Spanish full names into individual components (First Name, Second Name, Third Name, First Surname, Second Surname) using an **n8n workflow** and a **FastAPI** backend service.
 
 ## 🚀 Overview
 
