@@ -6,7 +6,7 @@ import pandas as pd
 app = FastAPI()
 
 def split_names(full_name: str):
-    words = {'de','la','los','del', 'da','las'}
+    words = {'de','la','los','del', 'da','las', 'O', 'Y','D'}
     original_words = str(full_name).lower().split()
 
     # group words
