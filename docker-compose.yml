@@ -3,6 +3,8 @@ services:
   python-api:
     build: .
     container_name: name-splitter-api
+    env_file:
+      - .env
     expose:
       - "8000"
 
@@ -10,8 +12,10 @@ services:
   tunnel:
     image: localxpose/localxpose:latest
     container_name: loclx-tunnel
+    env_file:
+      - .env
     environment:
-      - LX_ACCESS_TOKEN=WAyuc9eq3eTnFHaXuJgm3TZOejDkAMIQ7CIBWqft
+      - LX_ACCESS_TOKEN=${LX_ACCESS_TOKEN}
     # This command tells localxpose to point to the 'python-api' service on port 8000
     command: tunnel http --to python-api:8000
     depends_on:

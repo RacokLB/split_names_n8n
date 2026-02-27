@@ -1,6 +1,8 @@
-fastapi
-uvicorn
-pandas
-pydantic
-openpyxl
-python-multipart
+fastapi==0.115.8
+uvicorn==0.34.0
+pydantic==2.10.6
+python-multipart==0.0.20
+python-dotenv==1.2.1
+slowapi==0.1.9
+openpyxl==3.1.5
+xlsxwriter==3.2.2

@@ -7,6 +7,7 @@ venv/
 ENV/
 env/
 .env
+.pytest_cache/
 
 # Docker
 .dockerignore
@@ -18,3 +19,7 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Test data
+*.xlsx
+test_api.py

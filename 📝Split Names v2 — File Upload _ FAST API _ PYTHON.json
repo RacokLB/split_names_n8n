@@ -1,0 +1,462 @@
+{
+  "name": "📝Split Names v2 — File Upload / FAST API / PYTHON",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "name": "=backup_{{ $json.name }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -3136,
+        1200
+      ],
+      "id": "3fd16c60-3933-494f-aafa-1987bef3d947",
+      "name": "Backup Original",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "GLynxZOI4hkVPAsy",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "fileName": "data_to_process.xlsx"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -2848,
+        1200
+      ],
+      "id": "7b691b9a-7f8f-4505-8b72-4c6cb522d3bb",
+      "name": "Download XLSX",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "GLynxZOI4hkVPAsy",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ypfxlxuxds.loclx.io/process_file?header_row=1",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "={{ $vars.API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "file"
+            }
+          },
+          "timeout": 120000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -2576,
+        1200
+      ],
+      "id": "b05bb894-cbdd-4890-a2b1-79e1fe0aaff3",
+      "name": "Upload to API"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "check-status",
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 200,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2288,
+        1200
+      ],
+      "id": "bb8e63eb-647c-40b7-bd55-aa35b99aa28e",
+      "name": "If Success"
+    },
+    {
+      "parameters": {
+        "name": "processed_names.xlsx",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1IvUzN3QC6eBiUtKaUtRuc1fDX-ztDv4O",
+          "mode": "list",
+          "cachedResultName": "splitNamesN8N",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1IvUzN3QC6eBiUtKaUtRuc1fDX-ztDv4O"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1936,
+        1104
+      ],
+      "id": "74959be1-fa45-4655-bdc4-ecb95c46fba7",
+      "name": "Upload Result to Drive",
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "GLynxZOI4hkVPAsy",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "consejonacionalprogramming@gmail.com",
+        "subject": "✅ Hola, Soy Botsito — Data Procesada con Éxito",
+        "message": "=Hola! 🫡\n\nEl archivo XLSX fue procesado exitosamente por el Name Splitter API.\n\n📊 Resumen del procesamiento:\n- Se subió el archivo procesado a Google Drive como 'processed_names.xlsx'\n- Los nombres fueron separados en: p_nombre, s_nombre, t_nombre, p_apellido, s_apellido\n- El archivo incluye 3 hojas: Processed, Rejected (filas con errores), y Summary\n\n✅ Revisa el archivo en tu carpeta de Google Drive.\n\n🤞 Hasta luego!",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -1552,
+        1168
+      ],
+      "id": "2ad7e90f-5394-4198-875b-fc3dfb6f7969",
+      "name": "Success Email",
+      "webhookId": "b071b6cb-f67d-4e96-91f8-73f933791a1d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "KTTMJRfh3yclbSSU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "consejonacionalprogramming@gmail.com",
+        "subject": "❌ Hola Soy Botsito — Error en el procesamiento",
+        "message": "Es un placer saludarle.\n\nPero tengo malas noticias, el proceso de separación de nombres complejos tuvo un error.\n\nEl API respondió con un código de error. Posibles causas:\n- El archivo XLSX no tiene el formato esperado\n- El servidor API está caído o tiene un error interno\n- El túnel no está activo\n\nVe a revisar qué está sucediendo por favor!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -1888,
+        1456
+      ],
+      "id": "04d59b8d-fdbe-491c-8853-69a1b54374eb",
+      "name": "Error Email",
+      "webhookId": "9cd2d3d7-e53a-44fe-90dd-d6bdd1fed4f4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "KTTMJRfh3yclbSSU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Backup Original').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "deletePermanently": false
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1344,
+        1168
+      ],
+      "id": "844cdd6a-7906-43c3-82ba-893379bb67a2",
+      "name": "Delete Original",
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "GLynxZOI4hkVPAsy",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Stage 1: Trigger & Download\n\n1. **Google Drive Trigger** — Polls every minute for new files in the watch folder.\n2. **Backup Original** — Creates a backup copy of the original file.\n3. **Download XLSX** — Downloads the file as binary for API upload.",
+        "height": 384,
+        "width": 800,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3472,
+        944
+      ],
+      "typeVersion": 1,
+      "id": "5e4e345d-eba1-4e9e-a6d2-48359865ee11",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Stage 2: API Processing\n\n4. **Upload to API** — Sends the XLSX binary to `/process_file?header_row=4`. The API:\n   - Reads the XLSX\n   - Validates & cleans data (Cédula, Nacionalidad, Nombre)\n   - Splits names into columns\n   - Returns a processed XLSX (3 sheets)\n\n5. **If Success** — Checks HTTP status code = 200.",
+        "height": 376,
+        "width": 600,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2640,
+        944
+      ],
+      "typeVersion": 1,
+      "id": "60f82967-10ff-4170-935f-cb1b480fc793",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Stage 3: Output & Notification\n\n6. **Upload Result to Drive** — Uploads the processed XLSX back to Drive.\n7. ** Combine**  — Received both output, but only used data provide for if node.\n7. **Success/Error Email** — Sends notification to the administrator with xlsx file into mail.\n8. **Delete Original** — Cleans up the original file (moves to trash).",
+        "height": 368,
+        "width": 800,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1952,
+        944
+      ],
+      "typeVersion": 1,
+      "id": "5329633e-75ed-4e68-af7a-49d0e9905f7f",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1IvUzN3QC6eBiUtKaUtRuc1fDX-ztDv4O",
+          "mode": "list",
+          "cachedResultName": "splitNamesN8N",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1IvUzN3QC6eBiUtKaUtRuc1fDX-ztDv4O"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3408,
+        1200
+      ],
+      "id": "d10abe29-87d4-480f-9c65-b06f222f18c5",
+      "name": "Google Drive Trigger1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "GLynxZOI4hkVPAsy",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch",
+        "useDataOfInput": 2
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1744,
+        1168
+      ],
+      "id": "ca974158-8cb5-43b4-932e-45756cec0482",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Backup Original": {
+      "main": [
+        [
+          {
+            "node": "Download XLSX",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download XLSX": {
+      "main": [
+        [
+          {
+            "node": "Upload to API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to API": {
+      "main": [
+        [
+          {
+            "node": "If Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Success": {
+      "main": [
+        [
+          {
+            "node": "Upload Result to Drive",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Error Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Result to Drive": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Success Email": {
+      "main": [
+        [
+          {
+            "node": "Delete Original",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Backup Original",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Success Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "e59d003f-be65-4c5f-b021-0875f9052138",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cce031681206cc23d148c675677a18b39bc9c2406e2d6cc98c38b7a324ab82ca"
+  },
+  "id": "asJJC2XztfBsCbIh",
+  "tags": []
+}
